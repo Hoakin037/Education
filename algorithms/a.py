@@ -1,31 +1,34 @@
-def counting_sort(alist, largest):
-    c = [0]*(largest + 1)
-    for i in range(len(alist)):
-        c[alist[i]] = c[alist[i]] + 1 # equal c[alist[i]] += 1 
- 
-    result = []
-    result = [i for i in range(len(c)) for _ in range(c[i])] # Ускоренная версия
-    
-    return result
+from typing import List
 
 class Solution:
-    def minimumAbsDifference(self, arr: List[int]) -> List[List[int]]:
-        if len(arr) <= 2:
-            return [arr]
-        abs_min = max(arr)
-        arr = sorted(arr)
-        lst_difs = [[]]
-        for i in range(len(arr) - 1):
-            current_diff = arr[i + 1] - arr[i]
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        # 1. Подсчитываем частоту каждого числа
+        freq_map = {}
+        for num in nums:
+            freq_map[num] = freq_map.get(num, 0) + 1
         
-            if current_diff < abs_min:
-                abs_min = current_diff
-                lst_difs = [[arr[i], arr[i + 1]]]  
-            elif current_diff == abs_min:
-                lst_difs.append([arr[i], arr[i + 1]])
-    
+        # 2. Создаем корзины (buckets)
+        # Индекс корзины = частота, значение = список чисел с этой частотой
+        buckets = [[] for _ in range(len(nums) + 1)]
+        
+        # 3. Распределяем числа по корзинам в зависимости от их частоты
+        for num, count in freq_map.items():
+            buckets[count].append(num)
+        
+        # 4. Собираем k самых частых элементов
+        result = []
+        # Идем от самых высоких частот к самым низким
+        for i in range(len(buckets) - 1, 0, -1):
+            if buckets[i]:  # если корзина не пустая
+                for num in buckets[i]:
+                    result.append(num)
+                    if len(result) == k:
+                        return result
+        
+        return result
 
-        return lst_difs
-
-
-
+# Тестирование
+s = Solution()
+print(s.topKFrequent([1,1,1,2,2,3], k=2))  # Output: [1,2]
+print(s.topKFrequent([1], k=1))            # Output: [1]
+print(s.topKFrequent([1,2,1,2,1,2,3,1,3,2], k=2))  # Output: [1,2]

@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated
 import jwt
 from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordRequestForm
 from jwt import PyJWTError  
 from pwdlib import PasswordHash
@@ -153,7 +154,9 @@ async def login_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Dep
     access_token = create_access_token({"sub": user.username})
     refresh_token = create_refresh_token({"sub": user.username})
 
-    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+    response = JSONResponse(content={"access_token": access_token, "token_type": "bearer"})
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True) # Добавляем RT в куки
+    return response
 
 @app.post("/token/refresh", response_model=TokenRefresh)
 async def refresh_token(credentials: HTTPAuthorizationCredentials = Depends(oauth2_scheme)):

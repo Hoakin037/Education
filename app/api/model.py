@@ -28,6 +28,8 @@ class UserUpdate(UserBase):
 
 class UserInDB(UserBase):
     hashed_password: str
+    username: str
+    disabled: bool = False
 
 class Token(BaseModel):
     access_token: str

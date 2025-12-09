@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
-from app.model import UserBase
-from app.auth import get_current_active_user
+from api.model import UserBase
+from api.auth import get_current_active_user
 
 item = APIRouter(prefix='/users')
 

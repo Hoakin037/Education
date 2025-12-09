@@ -8,7 +8,7 @@ from fastapi import APIRouter
 from jwt import PyJWTError  
 
 from api.model import SignUpResp, SignUp, Token
-from db.main import get_user, add_user
+from api.db import get_user, add_user
 from api.auth import password_hash, authenticate_user, create_token, oauth2_scheme, SECRET_KEY, ALGORITHM
 
 auth = APIRouter()

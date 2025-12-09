@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 import jwt
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordRequestForm
 from fastapi import Depends, HTTPException
-from .db.main import get_user
+from .db import get_user
 from .model import ValidationError, UserBase
 
 
@@ -25,7 +25,7 @@ password_hash = PasswordHash.recommended()
 def create_token(data: dict, token_type: str, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=15))
-    to_encode.update({'exp': expire, "type": type})
+    to_encode.update({'exp': expire, "type": token_type})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def authenticate_user(username: str, password: str):

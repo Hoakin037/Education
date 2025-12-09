@@ -8,4 +8,4 @@ def get_user(username: str):
     return None
 
 def add_user(username: str, data: dict):
-    fake_users_db[username] = dict
+    fake_users_db[username] = data

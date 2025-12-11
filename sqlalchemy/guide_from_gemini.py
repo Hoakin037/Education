@@ -104,7 +104,7 @@ def run_example():
             print(f"Адреса Сэнди: {user_sandy.addresses}")
 
 
-        print("\n--- UPDATE ---")
+        print("\n--- UPDATE --- ")
         
         # Получаем Патрика
         patrick_obj = session.scalars(select(User).where(User.name == "patrick")).first()

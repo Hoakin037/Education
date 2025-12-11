@@ -1,12 +1,5 @@
-<<<<<<< HEAD
 # .gitignore
 *.db
 *.db-shm
 *.db-wal
 *.env
-=======
-.env
-.db
-.db-shm
-.db-wal
->>>>>>> 875cd70ccf2a25f89e7ccc4380c1e376214f123d

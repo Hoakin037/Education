@@ -22,7 +22,9 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(30))
     password: Mapped[str] = mapped_column(String(255))
     fullname: Mapped[Optional[str]]
-    is_active: Mapped[bool] = mapped_column(default=False) # добавить рефреш
+    is_active: Mapped[bool] = mapped_column(default=False)
+    refresh_token: Mapped[Optional[str]] = mapped_column(default=None)
+
 def init_db():
     Base.metadata.create_all(engine)
 

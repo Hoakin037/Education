@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from core import SECRET_KEY, ALGORITHM
 from datetime import datetime, timedelta, timezone
 from jwt import encode
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"

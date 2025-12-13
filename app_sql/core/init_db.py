@@ -25,15 +25,11 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(default=False)
     refresh_token: Mapped[Optional[str]] = mapped_column(default=None)
 
-<<<<<<< HEAD
 async def init_db():
     """Создает все таблицы в базе данных"""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-=======
-def init_db():
-    Base.metadata.create_all(engine)
->>>>>>> 1e3febc24c51169e3be1bcb88d018283a1510121
+
 
 async_session_maker = sessionmaker(
     engine, class_=AsyncSession, expire_on_commit=False

@@ -47,12 +47,12 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials | None = De
     except PyJWTError:
         raise HTTPException(status_code=401, detail="Токен просрочен или повреждён")
 
-    user = get_user(username)
+    user = crud.get_user(username, db)
     if user is None:
         raise HTTPException(status_code=401, detail="Пользователь не найден!")
     return user
 
-async def get_current_active_user(current_user: UserBase = Depends(get_current_user)):
-    if current_user.disabled:
+async def get_current_active_user(user: str = Depends(get_current_user)):
+    if user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
+    return user

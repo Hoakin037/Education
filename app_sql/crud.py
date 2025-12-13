@@ -32,15 +32,15 @@ class CRUD():
         await db.refresh(user)
 
     async def update_user_info(self, data: dict, db: AsyncSession):
-        current_email = data['current_email']
-        new_email = data['new_email']
-        name = data['name']
-        fullname = data['fullname']
+        current_email = data['current_email']  # Обязательное поле, оставляем как есть
+        new_email = data.get('new_email')      # Измените на get
+        name = data.get('name')                # Измените на get
+        fullname = data.get('fullname')        # Измените на get
 
         existing_user = await self.get_user(current_email, db)
-        if existing_user != None:
+        if existing_user is not None:  # Исправьте на is not None (лучшая практика)
             existing_user.email = new_email if new_email else current_email
-            existing_user.name =  name if name else existing_user.name
+            existing_user.name = name if name else existing_user.name
             existing_user.fullname = fullname if fullname else existing_user.fullname
 
             await db.commit()
@@ -59,6 +59,7 @@ class CRUD():
         existing_user = await self.get_user(email, db)
         if existing_user != None:
             existing_user.refresh_token = new_token
+            existing_user.is_active = True
             await db.commit() 
         else:
             raise HTTPException(status_code=401, detail="Неверный пароль!")

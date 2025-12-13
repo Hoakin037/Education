@@ -3,7 +3,7 @@ from pydantic import EmailStr, BaseModel, Field
 class UserUpdateInfo(BaseModel):
     current_email: str  = Field(max_length=255)
     new_email: str | None = Field(default=None, max_length=255)
-    full_name: str | None = Field(default=None, max_length=255)
+    fullname: str | None = Field(default=None, max_length=255)
     name: str | None = Field(default=None, max_length=255)
 
 class UpdatePassword(BaseModel):

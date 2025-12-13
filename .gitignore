@@ -3,3 +3,9 @@
 *.db-shm
 *.db-wal
 *.env
+*/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.pyc

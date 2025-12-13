@@ -8,23 +8,27 @@ from sqlalchemy.orm import (
     sessionmaker
     )
 
-engine = create_async_engine("postgresql+asyncpg://localhostapp_sql/db/database.db")
+engine = create_async_engine("postgresql+asyncpg://postgres:fimoZNyiYe6an@localhost:5432/app_sql")
 
 class Base(DeclarativeBase):
     """Базовый класс для всех моделей."""
     pass
 
 class User(Base):
-    __tablename__ = "Users"
+    __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(255))
     name: Mapped[str] = mapped_column(String(30))
     password: Mapped[str] = mapped_column(String(255))
     fullname: Mapped[Optional[str]]
-    is_active: Mapped[bool] = mapped_column(default=False) # добавить рефреш
-def init_db():
-    Base.metadata.create_all(engine)
+    is_active: Mapped[bool] = mapped_column(default=False)
+    refresh_token: Mapped[Optional[str]] = mapped_column(default=None)
+
+async def init_db():
+    """Создает все таблицы в базе данных"""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 async_session_maker = sessionmaker(
     engine, class_=AsyncSession, expire_on_commit=False
@@ -32,4 +36,11 @@ async_session_maker = sessionmaker(
 
 async def get_db():
     async with async_session_maker() as session:
-        yield session
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()

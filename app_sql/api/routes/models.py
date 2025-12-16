@@ -1,5 +1,8 @@
 from pydantic import EmailStr, BaseModel, Field
 
+class UserBase(BaseModel):
+    email: str = Field(max_length=255)
+    
 class UserUpdateInfo(BaseModel):
     current_email: str  = Field(max_length=255)
     new_email: str | None = Field(default=None, max_length=255)

@@ -1,8 +1,7 @@
-from pwdlib import PasswordHash
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import HTTPException, Depends
-from app_sql.core import SECRET_KEY, ALGORITHM, password_hash, User
-from app_sql.crud import CRUD, get_db
+from app_sql.core import SECRET_KEY, ALGORITHM, User, get_db
+from app_sql.crud import CRUD
 import jwt
 from jwt import PyJWTError  
 from typing import Annotated

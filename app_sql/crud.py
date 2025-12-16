@@ -1,8 +1,7 @@
-from .core import User, get_db
-from pwdlib import PasswordHash
+from .core import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 
 class CRUD():
     
@@ -32,10 +31,10 @@ class CRUD():
         await db.refresh(user)
 
     async def update_user_info(self, data: dict, db: AsyncSession):
-        current_email = data['current_email']  # Обязательное поле, оставляем как есть
-        new_email = data.get('new_email')      # Измените на get
-        name = data.get('name')                # Измените на get
-        fullname = data.get('fullname')        # Измените на get
+        current_email = data['email']  
+        new_email = data['new_email']
+        name = data['name']                
+        fullname = data['fullname']
 
         existing_user = await self.get_user(current_email, db)
         if existing_user is not None:  # Исправьте на is not None (лучшая практика)

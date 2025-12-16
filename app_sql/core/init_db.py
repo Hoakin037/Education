@@ -11,7 +11,6 @@ from sqlalchemy.orm import (
 engine = create_async_engine("postgresql+asyncpg://postgres:fimoZNyiYe6an@localhost:5432/app_sql")
 
 class Base(DeclarativeBase):
-    """Базовый класс для всех моделей."""
     pass
 
 class User(Base):
@@ -26,7 +25,6 @@ class User(Base):
     refresh_token: Mapped[Optional[str]] = mapped_column(default=None)
 
 async def init_db():
-    """Создает все таблицы в базе данных"""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 

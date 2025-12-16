@@ -1,4 +1,3 @@
-from pydantic import BaseModel
 from app_sql.core import SECRET_KEY, ALGORITHM
 from datetime import datetime, timedelta, timezone
 from jwt import encode

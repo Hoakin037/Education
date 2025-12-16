@@ -1,18 +1,16 @@
-from typing import Annotated
-import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import Response
 
-from app_sql.crud import CRUD, get_db
+from app_sql.crud import CRUD
 from .models import UserUpdateInfo, UserBase
 from .utils import  get_current_active_user
-from app_sql.core import User
+from app_sql.core import User, get_db
 
 user = APIRouter(prefix="/user")
-crud = CRUD()
+crud = CRUD() 
 
 @user.get('/get_user_info')
 async def get_user_info(
@@ -34,17 +32,17 @@ async def get_user_info(
 
 @user.post('/update_user_info')
 async def update_user_info(
-    data: UserUpdateInfo,
+    user_data: UserUpdateInfo,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
     try:
-        if current_user.email != data.current_email:
+        if current_user.email != user_data.email:
             raise HTTPException(status_code=403, detail="Unauthorized")
         
-        data_dict = data.model_dump(exclude_none=True)
+        user_data = user_data.model_dump(exclude_none=True)
         
-        await crud.update_user_info(data_dict, db)
+        await crud.update_user_info(user_data, db)
         response = JSONResponse(content={"detail": "Данные обновлены"}, status_code=200)
         return response
     except HTTPException as e:
@@ -61,7 +59,7 @@ async def del_user(
     try:
         if current_user.email != user.email:
             raise HTTPException(status_code=401, detail="Пользователя с таким email нет!")
-        crud.delete_user(user.email, db)
+        await crud.delete_user(user.email, db)
         
         return Response(status_code=204)
     except HTTPException as e:

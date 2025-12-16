@@ -8,10 +8,10 @@ from jwt import PyJWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .jwt import create_token
-from app_sql.crud import CRUD, get_db
-from .models import UserRegister, UpdatePassword, UserUpdateInfo
-from .utils import oauth2_scheme
-from app_sql.core import SECRET_KEY, ALGORITHM, password_hash
+from app_sql.crud import CRUD
+from .models import UserRegister, UpdatePassword
+from .utils import oauth2_scheme, get_current_active_user
+from app_sql.core import SECRET_KEY, ALGORITHM, password_hash,  User, get_db
 
 auth = APIRouter(prefix="/auth")
 crud = CRUD()
@@ -94,7 +94,33 @@ async def refresh_tokens(credentials: HTTPAuthorizationCredentials = Depends(oau
 
     access_token=create_token({"sub": email}, "access")
     refresh_token=create_token({"sub": email}, 'refresh')
-    
+    await crud.update_refresh_token(email, refresh_token, db)
+
     response = JSONResponse(content={"access_token": access_token, "token_type": "bearer"})
-    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True) # Добавляем RT в куки
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True) 
+    
     return response
+
+@auth.post('/update_password')
+async def update_password(credentials: UpdatePassword, 
+                          db: AsyncSession = Depends(get_db),current_user: User = Depends(get_current_active_user)
+):
+    try:
+        if current_user.email != credentials.email:
+            raise HTTPException(status_code=403, detail="Пользователя с таким email не сущетсвует!")
+        
+        if password_hash.verify(credentials.current_password, current_user.password):
+            await crud.update_user_password({
+                "email": credentials.email,
+                "password": credentials.new_password
+            }, db)
+            return JSONResponse(status_code=200, content={
+                "detail": "Пароль успешно изменен!"
+            })
+        else:
+            raise HTTPException(status_code=401, detail="Неверный пароль!")
+    except HTTPException as e:
+        raise e
+    except Exception:
+        raise HTTPException(status_code=500, detail="Ошибка сервера!")
+

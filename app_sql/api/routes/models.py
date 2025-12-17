@@ -19,3 +19,4 @@ class UserRegister(UserBase):
     name: str = Field(max_length=30)
     fullname: str | None = Field(max_length=255, default=None)
 
+# Сделать валидацию полей, если че-то пошло не так возвращать ошибку HTTP

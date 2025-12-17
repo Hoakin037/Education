@@ -9,19 +9,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 crud = CRUD()
 
-class JWTBearer(HTTPBearer):
-    def __init__(self, auto_error: bool = True):
-        super().__init__(auto_error=auto_error, scheme_name="JWT", description="Вставьте сюда только JWT-токен (без Bearer)")
 
-oauth2_scheme = JWTBearer(auto_error=False)
+oauth2_scheme = HTTPBearer()
 
 async def get_current_user(
     db: Annotated[AsyncSession, Depends(get_db)],
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(oauth2_scheme)]
 ):
-    if credentials is None:
-        raise HTTPException(status_code=401, detail="Требуется токен")
-    
     token = credentials.credentials  
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

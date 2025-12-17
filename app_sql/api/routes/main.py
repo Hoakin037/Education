@@ -6,3 +6,4 @@ api = APIRouter(prefix='/api')
 
 api.include_router(auth)
 api.include_router(user)
+

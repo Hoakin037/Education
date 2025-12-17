@@ -38,7 +38,7 @@ class CRUD():
 
         existing_user = await self.get_user(current_email, db)
         if existing_user is not None:  # Исправьте на is not None (лучшая практика)
-            existing_user.email = new_email if new_email else current_email
+            existing_user.email = new_email if new_email is not None else current_email
             existing_user.name = name if name else existing_user.name
             existing_user.fullname = fullname if fullname else existing_user.fullname
 
@@ -72,3 +72,5 @@ class CRUD():
             raise HTTPException(status_code=404, detail="Пользователь не найден!")
         
         
+async def get_crud_service():
+    return CRUD()

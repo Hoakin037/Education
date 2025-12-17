@@ -23,21 +23,21 @@ class CRUD():
         user = User(email=email, name=name, fullname=fullname, password=password)
 
         existing_user = await self.get_user(user.email, db)
-        if existing_user != None:
+        if existing_user is not None:
             raise HTTPException(status_code=400, detail="Пользователь с таким email уже существует!")
 
         db.add(user)
         await db.commit()
         await db.refresh(user)
 
-    async def update_user_info(self, data: dict, db: AsyncSession):
-        current_email = data['email']  
-        new_email = data['new_email']
-        name = data['name']                
-        fullname = data['fullname']
+    async def update_user_info(self, data, db: AsyncSession):
+        current_email = data.email  
+        new_email = data.new_email
+        name = data.name                
+        fullname = data.fullname
 
         existing_user = await self.get_user(current_email, db)
-        if existing_user is not None:  # Исправьте на is not None (лучшая практика)
+        if existing_user is not None: 
             existing_user.email = new_email if new_email is not None else current_email
             existing_user.name = name if name else existing_user.name
             existing_user.fullname = fullname if fullname else existing_user.fullname
@@ -49,14 +49,15 @@ class CRUD():
 
     async def update_user_password(self, data: dict, db: AsyncSession):
         existing_user = await self.get_user(data['email'], db)
-        if existing_user != None:
+        if existing_user is not None:
                 existing_user.password = data['password']
+                await db.commit()
         else:
             raise HTTPException(status_code=404, detail="Пользователь не найден!")
 
     async def update_refresh_token(self, email: str, new_token: str, db: AsyncSession):
         existing_user = await self.get_user(email, db)
-        if existing_user != None:
+        if existing_user is not None:
             existing_user.refresh_token = new_token
             existing_user.is_active = True
             await db.commit() 
@@ -65,7 +66,7 @@ class CRUD():
         
     async def delete_user(self, email: str, db: AsyncSession):
         existing_user = await self.get_user(email, db)
-        if existing_user != None:
+        if existing_user is not None:
             await db.delete(existing_user)
             await db.commit()
         else:

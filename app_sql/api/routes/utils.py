@@ -1,20 +1,19 @@
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi import HTTPException, Depends
 from app_sql.core import SECRET_KEY, ALGORITHM, User, get_db
-from app_sql.crud import CRUD
+from app_sql.crud import CRUD, get_crud_service
 import jwt
 from jwt import PyJWTError  
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
-
-crud = CRUD()
 
 
 oauth2_scheme = HTTPBearer()
 
 async def get_current_user(
     db: Annotated[AsyncSession, Depends(get_db)],
-    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(oauth2_scheme)]
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(oauth2_scheme)],
+    crud: CRUD = Depends(get_crud_service)
 ):
     token = credentials.credentials  
     try:

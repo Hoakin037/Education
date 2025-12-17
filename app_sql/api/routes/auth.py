@@ -18,7 +18,6 @@ auth = APIRouter(prefix="/auth")
 @auth.post('/signup', status_code=status.HTTP_201_CREATED)
 async def signup(user: UserRegister, 
                  db: AsyncSession = Depends(get_db),
-                 crud: CRUD = Depends(get_crud_service),
                  auth_service: AuthService = Depends(get_auth_service)):
     await auth_service.register_new_user(user, db)
     return {
@@ -31,9 +30,8 @@ async def signup(user: UserRegister,
 @auth.post('/login')
 async def login(credentials: Annotated[OAuth2PasswordRequestForm, Depends()], 
                 db: AsyncSession = Depends(get_db),
-                crud: CRUD = Depends(get_crud_service),
                 auth_service: AuthService = Depends(get_auth_service)):
-    user = await auth_service.authenticate_user(credentials.username, credentials.password)
+    user = await auth_service.authenticate_user(credentials.username, credentials.password, db)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -105,7 +103,7 @@ async def update_password(credentials: UpdatePassword,
         
         await crud.update_user_password({
             "email": credentials.email,
-            "password": password_hash(credentials.new_password)},
+            "password": password_hash.hash(credentials.new_password)},
             db)
         return JSONResponse(status_code=200, content={
             "detail": "Пароль успешно изменен!"
